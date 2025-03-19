@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KS Updated Wingo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'El Messiri', sans-serif;
+            text-align: center;
+        }
+
+        body {
+            background: url('https://i.ibb.co/LdtcbSLX/74f09d279fb2e94226b2a889cac0a976.jpg') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: white;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .top-box, .analysis, .history {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .box {
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .green { background: rgba(0, 255, 0, 0.3); border: 1px solid green; }
+        .red { background: rgba(255, 0, 0, 0.3); border: 1px solid red; }
+        .blue { background: rgba(0, 0, 255, 0.3); border: 1px solid blue; }
+        .grey { background: rgba(128, 128, 128, 0.3); border: 1px solid grey; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <p>KS UPDATED <span class="WINGO">WINGO</span></p>
+        </div>
+
+        <div class="top-box">
+            <p><b>Period:</b> <span id="period-number">Loading...</span></p>
+            <p><b>Result:</b> <span id="predicted-result">Loading...</span></p>
+        </div>
+
+        <div class="analysis">
+            <h2>Analysis</h2>
+            <div class="grid">
+                <div class="box green">
+                    <p>WIN Count</p>
+                    <span id="win-count">0</span>
+                </div>
+                <div class="box red">
+                    <p>Lost Count</p>
+                    <span id="loss-count">0</span>
+                </div>
+                <div class="box blue">
+                    <p>WIN %</p>
+                    <span id="win-percentage">0%</span>
+                </div>
+                <div class="box grey">
+                    <p>Auto-Reverse</p>
+                    <span>Active</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let latestPeriod = null;
+        let latestResult = null;
+
+        async function fetchCurrentGameIssue() {
+            const apiUrl = 'https://api.bdg88zf.com/api/webapi/GetGameIssue';
+            const requestData = {
+                typeId: 1,
+                language: 0,
+                random: "40079dcba93a48769c6ee9d4d4fae23f",
+                signature: "D12108C4F57C549D82B23A91E0FA20AE",
+                timestamp: 1727792520,
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+                    body: JSON.stringify(requestData),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.code === 0) {
+                        latestPeriod = data.data.issueNumber;
+                        document.getElementById('period-number').textContent = latestPeriod;
+                        calculateBigSmall();
+                    } else {
+                        console.error("❌ API returned error:", data.message);
+                    }
+                } else {
+                    console.error("❌ API Response Error:", response.status);
+                }
+            } catch (error) {
+                console.error("❌ Fetch error:", error);
+            }
+        }
+
+        function calculateBigSmall() {
+            if (!latestPeriod) return;
+
+            let sumOfDigits = latestPeriod.toString().split('').reduce((sum, digit) => sum + parseInt(digit), 0);
+            latestResult = (sumOfDigits % 10 <= 4) ? 'SMALL' : 'BIG';
+
+            document.getElementById('predicted-result').textContent = latestResult;
+        }
+
+        setInterval(fetchCurrentGameIssue, 5000);
+        fetchCurrentGameIssue();
+    </script>
+</body>
+</html>
