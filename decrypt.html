@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Color Prediction System</title>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark-bg: #0f172a;
+            --darker-bg: #0a0e1a;
+            --card-bg: rgba(15, 23, 42, 0.85);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border: rgba(148, 163, 184, 0.15);
+            --shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--darker-bg) 0%, #1e293b 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .app {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Animated gradient background */
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .gradient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.3;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+            top: -100px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, var(--secondary) 0%, transparent 70%);
+            bottom: -50px;
+            right: -50px;
+            animation-delay: 5s;
+        }
+
+        .orb-3 {
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, var(--success) 0%, transparent 70%);
+            top: 50%;
+            left: 80%;
+            animation-delay: 10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(20px, -20px) scale(1.05); }
+            50% { transform: translate(-15px, 10px) scale(0.95); }
+            75% { transform: translate(10px, 15px) scale(1.02); }
+        }
+
+        .main-container {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .content-wrapper {
+            width: 100%;
+            max-width: 680px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Header Section */
+        .header-section {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .logo-container {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 20px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%);
+            z-index: 1;
+        }
+
+        .logo-icon {
+            position: relative;
+            z-index: 2;
+            width: 40px;
+            height: 40px;
+            color: white;
+        }
+
+        .main-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(2.25rem, 5vw, 3rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.75rem;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Main Card */
+        .main-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .main-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .card-header {
+            padding: 2rem 2rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-title svg {
+            width: 20px;
+            height: 20px;
+            color: var(--primary);
+        }
+
+        .card-description {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .card-content {
+            padding: 2rem;
+        }
+
+        /* Input Section */
+        .input-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .input-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .input-label svg {
+            width: 16px;
+            height: 16px;
+            color: var(--primary);
+        }
+
+        .input-field {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1.5px solid var(--border);
+            color: var(--text-primary);
+            font-size: 1.25rem;
+            font-weight: 600;
+            text-align: center;
+            padding: 1rem;
+            height: 3.5rem;
+            border-radius: 12px;
+            transition: var(--transition);
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .input-field:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+            outline: none;
+        }
+
+        .input-field::placeholder {
+            color: #475569;
+            font-weight: 400;
+        }
+
+        /* Tabs */
+        .mode-tabs {
+            margin-top: 1.5rem;
+        }
+
+        .tabs-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            background: rgba(15, 23, 42, 0.5);
+            padding: 0.75rem;
+            border-radius: 14px;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .tab-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            border-radius: 10px;
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            opacity: 0;
+            transition: var(--transition);
+            z-index: -1;
+        }
+
+        .tab-item.active {
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .tab-item.active::before {
+            opacity: 1;
+        }
+
+        .tab-item:hover:not(.active) {
+            background: rgba(148, 163, 184, 0.1);
+            color: var(--text-primary);
+        }
+
+        .tab-item svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .tab-item span {
+            font-size: 0.9rem;
+        }
+
+        .mode-badge-info {
+            display: flex;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+
+        .info-badge {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-badge svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .tab-content {
+            display: none;
+            margin-top: 1.5rem;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Predict Button */
+        .predict-button {
+            width: 100%;
+            padding: 1.25rem;
+            font-size: 1rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border: none;
+            color: white;
+            border-radius: 12px;
+            transition: var(--transition);
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        .predict-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .predict-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(59, 130, 246, 0.4);
+        }
+
+        .predict-button:hover:not(:disabled)::before {
+            left: 100%;
+        }
+
+        .predict-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Prediction Result */
+        .prediction-result {
+            margin-top: 2rem;
+            animation: slideUp 0.4s ease;
+            display: none;
+        }
+
+        .prediction-result.show {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-display {
+            padding: 2.5rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .result-display::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: shimmer 4s infinite linear;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .result-header {
+            position: relative;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        .result-main {
+            position: relative;
+            font-family: 'Outfit', sans-serif;
+            font-size: 4rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            line-height: 1;
+            margin-bottom: 1.5rem;
+        }
+
+        .result-badge {
+            position: relative;
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        /* Multiple Numbers Display */
+        .multiple-numbers {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .number-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .number-label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .number-value {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Result Color Variants */
+        .result-number {
+            background: linear-gradient(135deg, var(--secondary) 0%, #6366f1 100%);
+        }
+
+        .result-big {
+            background: linear-gradient(135deg, var(--warning) 0%, #dc2626 100%);
+        }
+
+        .result-small {
+            background: linear-gradient(135deg, #06b6d4 0%, var(--primary) 100%);
+        }
+
+        .result-red {
+            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+        }
+
+        .result-green {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: white;
+            color: #1f2937;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            min-width: 300px;
+            animation: toastSlideIn 0.3s ease;
+            border-left: 4px solid;
+        }
+
+        @keyframes toastSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .toast.success {
+            border-left-color: var(--success);
+        }
+
+        .toast.error {
+            border-left-color: var(--danger);
+        }
+
+        .toast-icon {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .toast-message {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            position: relative;
+            z-index: 1;
+            margin-top: auto;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem;
+            }
+
+            .header-section {
+                margin-bottom: 2rem;
+            }
+
+            .logo-container {
+                width: 70px;
+                height: 70px;
+                margin-bottom: 1rem;
+            }
+
+            .main-title {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .input-section {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .card-header,
+            .card-content {
+                padding: 1.5rem;
+            }
+
+            .tabs-list {
+                grid-template-columns: 1fr;
+            }
+
+            .result-main {
+                font-size: 3rem;
+            }
+
+            .predict-button {
+                padding: 1rem;
+            }
+
+            .toast {
+                min-width: 250px;
+            }
+
+            .multiple-numbers {
+                gap: 1rem;
+            }
+
+            .number-value {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo-container {
+                width: 60px;
+                height: 60px;
+            }
+
+            .main-title {
+                font-size: 1.75rem;
+            }
+
+            .card-title {
+                font-size: 1.25rem;
+            }
+
+            .result-main {
+                font-size: 2.5rem;
+            }
+
+            .result-display {
+                padding: 2rem 1.5rem;
+            }
+
+            .multiple-numbers {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .number-item {
+                flex-direction: row;
+                justify-content: space-between;
+                width: 100%;
+            }
+
+            .number-value {
+                width: 45px;
+                height: 45px;
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Animated Background -->
+        <div class="background-animation">
+            <div class="gradient-orb orb-1"></div>
+            <div class="gradient-orb orb-2"></div>
+            <div class="gradient-orb orb-3"></div>
+        </div>
+
+           <div class="main-container">
+            <div class="content-wrapper">
+                <!-- Header -->
+                <div class="header-section">
+                    <div class="logo-container">
+                        <svg class="logo-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <circle cx="12" cy="12" r="6"></circle>
+                            <circle cx="12" cy="12" r="2"></circle>
+                        </svg>
+                    </div>
+                    <h1 class="main-title">Advanced Prediction System</h1>
+                    <p class="subtitle">Professional algorithm for precise number and color predictions</p>
+                </div>
+
+                <!-- Main Card -->
+                <div class="main-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                            </svg>
+                            Prediction System
+                        </div>
+                        <div class="card-description">Enter period number and results to generate prediction</div>
+                    </div>
+                    
+                    <div class="card-content">
+                        <!-- Input Section -->
+                        <div class="input-section">
+                            <div class="input-group">
+                                <label class="input-label" for="period">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                    </svg>
+                                    Period Number (Last 2 Digits)
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="period" 
+                                    class="input-field" 
+                                    placeholder="25" 
+                                    maxlength="2"
+                                />
+                            </div>
+
+                            <div class="input-group">
+                                <label class="input-label" for="results">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    Last 3 Results
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="results" 
+                                    class="input-field" 
+                                    placeholder="275" 
+                                    maxlength="3"
+                                />
+                            </div>
+                        </div>
+
+                        <!-- Mode Tabs -->
+                        <div class="mode-tabs">
+                            <div class="tabs-list">
+                                <button class="tab-item active" data-mode="number">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                                    </svg>
+                                    <span>Number</span>
+                                </button>
+                                <button class="tab-item" data-mode="big_small">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                                        <polyline points="17 6 23 6 23 12"></polyline>
+                                    </svg>
+                                    <span>Big/Small</span>
+                                </button>
+                                <button class="tab-item" data-mode="color">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+                                    </svg>
+                                    <span>Color</span>
+                                </button>
+                            </div>
+
+                            <div class="mode-badge-info">
+                                <div class="info-badge" id="modeBadge">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                    </svg>
+                                    Predicts 0-9
+                                </div>
+                            </div>
+
+                            <!-- Number Prediction -->
+                            <div class="tab-content active" data-content="number">
+                                <button class="predict-button" onclick="predict('number')">Predict Numbers</button>
+                                <div class="prediction-result" id="numberResult">
+                                    <div class="result-display result-number">
+                                        <div class="result-header">Predicted Numbers</div>
+                                        <div class="result-main" id="numberValue">-</div>
+                                        
+                                        <!-- Multiple Numbers Display -->
+                                        <div class="multiple-numbers">
+                                            <div class="number-item">
+                                                <div class="number-label">Primary</div>
+                                                <div class="number-value" id="firstNumber">-</div>
+                                            </div>
+                                            <div class="number-item">
+                                                <div class="number-label">Secondary</div>
+                                                <div class="number-value" id="secondNumber">-</div>
+                                            </div>
+                                            <div class="number-item">
+                                                <div class="number-label">AI Suggested</div>
+                                                <div class="number-value" id="thirdNumber">-</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Big/Small Prediction -->
+                            <div class="tab-content" data-content="big_small">
+                                <button class="predict-button" onclick="predict('big_small')">Predict Big/Small</button>
+                                <div class="prediction-result" id="bigSmallResult">
+                                    <div class="result-display" id="bigSmallDisplay">
+                                        <div class="result-header">Prediction Result</div>
+                                        <div class="result-main" id="bigSmallValue">-</div>
+                                        <div class="result-badge">Number: <span id="bigSmallNumber">-</span></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Color Prediction -->
+                            <div class="tab-content" data-content="color">
+                                <button class="predict-button" onclick="predict('color')">Predict Color</button>
+                                <div class="prediction-result" id="colorResult">
+                                    <div class="result-display" id="colorDisplay">
+                                        <div class="result-header">Predicted Color</div>
+                                        <div class="result-main" id="colorValue">-</div>
+                                        <div class="result-badge">Number: <span id="colorNumber">-</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Advanced Prediction System &copy; 2023. All predictions are algorithmically generated.</p>
+        </div>
+
+        <!-- Toast Container -->
+        <div class="toast-container" id="toastContainer"></div>
+    </div>
+
+    <script>
+        // Current active mode
+        let currentMode = 'number';
+
+        // Tab switching functionality
+        document.querySelectorAll('.tab-item').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const mode = this.getAttribute('data-mode');
+                switchTab(mode);
+            });
+        });
+
+        function switchTab(mode) {
+            currentMode = mode;
+            
+            // Update active tab
+            document.querySelectorAll('.tab-item').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
+            
+            // Update active content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelector(`[data-content="${mode}"]`).classList.add('active');
+            
+            // Update badge info
+            const badgeText = {
+                'number': 'Predicts 0-9',
+                'big_small': 'Small: 0-4 | Big: 5-9',
+                'color': 'Red: Even | Green: Odd'
+            };
+            document.getElementById('modeBadge').textContent = badgeText[mode];
+        }
+
+        // Input validation - only allow numbers
+        document.getElementById('period').addEventListener('input', function(e) {
+            this.value = this.value.replace(/\D/g, '');
+        });
+
+        document.getElementById('results').addEventListener('input', function(e) {
+            this.value = this.value.replace(/\D/g, '');
+        });
+
+        // Toast notification system
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icon = type === 'success' 
+                ? '<svg class="toast-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>'
+                : '<svg class="toast-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
+            
+            toast.innerHTML = `
+                ${icon}
+                <div class="toast-message">${message}</div>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'toastSlideIn 0.3s ease reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Prediction algorithm
+        function reduceToSingleDigit(num) {
+            while (num >= 10) {
+                num = String(num).split('').reduce((sum, digit) => sum + parseInt(digit), 0);
+            }
+            return num;
+        }
+
+        function calculatePrediction(periodDigits, resultDigits) {
+            const periodSum = periodDigits.split('').reduce((sum, digit) => sum + parseInt(digit), 0);
+            const periodReduced = reduceToSingleDigit(periodSum);
+            
+            const resultSum = resultDigits.split('').reduce((sum, digit) => sum + parseInt(digit), 0);
+            const resultReduced = reduceToSingleDigit(resultSum);
+            
+            let finalNumber = periodReduced - resultReduced;
+            
+            // Handle negative numbers
+            if (finalNumber < 0) {
+                finalNumber = 10 + finalNumber;
+            }
+            
+            return {
+                periodSum: periodReduced,
+                resultSum: resultReduced,
+                finalNumber: finalNumber
+            };
+        }
+
+        // AI-based calculation for the third number
+        function calculateAINumber(firstNumber, secondNumber, periodDigits, resultDigits) {
+            // Use a combination of the inputs to generate a "smart" number
+            const periodSum = periodDigits.split('').reduce((sum, digit) => sum + parseInt(digit), 0);
+            const resultSum = resultDigits.split('').reduce((sum, digit) => sum + parseInt(digit), 0);
+            
+            // Complex calculation using multiple factors
+            let aiNumber = (firstNumber * 3 + secondNumber * 7 + periodSum + resultSum) % 10;
+            
+            // Ensure we don't get the same number as first or second
+            if (aiNumber === firstNumber || aiNumber === secondNumber) {
+                aiNumber = (aiNumber + 5) % 10;
+            }
+            
+            return aiNumber;
+        }
+
+        function getPredictionText(number, mode) {
+            if (mode === 'number') {
+                return String(number);
+            } else if (mode === 'big_small') {
+                return number <= 4 ? 'Small' : 'Big';
+            } else if (mode === 'color') {
+                return number % 2 === 0 ? 'Red' : 'Green';
+            }
+            return String(number);
+        }
+
+        // Main prediction function
+        function predict(mode) {
+            const periodInput = document.getElementById('period');
+            const resultsInput = document.getElementById('results');
+            
+            const periodDigits = periodInput.value;
+            const resultDigits = resultsInput.value;
+            
+            // Validation
+            if (!periodDigits || periodDigits.length !== 2) {
+                showToast('Please enter exactly 2 digits for period number', 'error');
+                return;
+            }
+            
+            if (!resultDigits || resultDigits.length !== 3) {
+                showToast('Please enter exactly 3 digits for last results', 'error');
+                return;
+            }
+            
+            // Calculate prediction
+            const result = calculatePrediction(periodDigits, resultDigits);
+            const prediction = getPredictionText(result.finalNumber, mode);
+            
+            // Display results based on mode
+            if (mode === 'number') {
+                // Calculate three numbers
+                const firstNumber = result.finalNumber;
+                const secondNumber = (firstNumber - 2) >= 0 ? (firstNumber - 2) : (10 + (firstNumber - 2));
+                const thirdNumber = calculateAINumber(firstNumber, secondNumber, periodDigits, resultDigits);
+                
+                // Display all three numbers
+                document.getElementById('numberValue').textContent = firstNumber;
+                document.getElementById('firstNumber').textContent = firstNumber;
+                document.getElementById('secondNumber').textContent = secondNumber;
+                document.getElementById('thirdNumber').textContent = thirdNumber;
+                
+                document.getElementById('numberResult').classList.add('show');
+            } else if (mode === 'big_small') {
+                document.getElementById('bigSmallValue').textContent = prediction;
+                document.getElementById('bigSmallNumber').textContent = result.finalNumber;
+                const display = document.getElementById('bigSmallDisplay');
+                display.className = 'result-display ' + (prediction === 'Big' ? 'result-big' : 'result-small');
+                document.getElementById('bigSmallResult').classList.add('show');
+            } else if (mode === 'color') {
+                document.getElementById('colorValue').textContent = prediction;
+                document.getElementById('colorNumber').textContent = result.finalNumber;
+                const display = document.getElementById('colorDisplay');
+                display.className = 'result-display ' + (prediction === 'Red' ? 'result-red' : 'result-green');
+                document.getElementById('colorResult').classList.add('show');
+            }
+            
+            showToast('Prediction generated!', 'success');
+        }
+
+        // Hide results when switching tabs
+        document.querySelectorAll('.tab-item').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.prediction-result').forEach(result => {
+                    result.classList.remove('show');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
